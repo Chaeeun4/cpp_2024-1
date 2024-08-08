@@ -1,0 +1,62 @@
+ COMPILE & LINK
+g++ Lab1.o Lab1.cpp > 오브젝트(기계어)를 만들어라
+g++ Lab1.exe Lab1.o Matrix.o > 두 오브젝트를 병합(linking)하여 실행파일(병합된 기계어)을 하나 만들어라
+> g++ 명령어로 옵션만 달리해서 컴파일, 링크 할 수 있당..@!
+> 파일이 10개라면, 컴파일 10번, 링크 1번
+
+
+
+ MAIN 함수와 CPU core
+.cpp 가 여러개로 쪼개져도 한 프로그램에 main 함수는 하나
+main은 조직의 entry이기 때문에 꼭 하나여야 함
+
+CPU : core (cpu 개수) , main 함수 하나가 cpu core 하나를 씀
+3 core를 더 쓰고 싶다면 다른 프로그램(exe)을 여러개 실행 
+-- 병행처리 (프로그램 4개가 다 달라서)
+
+advanced program - main급 함수 4개, cpu core를 4개 쓰는 한 함수
+(ex. web server - 프로그래밍 언어, 하드웨어)
+thread routine - main급 함수 ?
+
+cpp --compiler--> o --linker--> exe
+기계어 : cpu를 동작시키는 신호
+cpu : 계산기
+
+
+
+ MAKEFILE 
+command를 묶어서 작성, 
+make만 쳐주면 makefile에 적혀진대로 컴파일이 10번됨
+
+'''
+CC=g++
+CFLAGS=-g -I. -fpermissive -Wno-deprecated -std=c++14
+LDFLAGS=
+DEBUG=0
+DEPS=Matrix.h
+
+all:: Lab1.exe  > 타겟 (콜론) Dependency List
+                > all을 만들려면 Lab1.exe가 필요하다
+
+Lab1.exe: Lab1.o Matrix.o   > Lab1.exe륾 만드려면 Lab1.o Matrix.o가 필요하다
+	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+
+%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+%.o: %.cpp $(DEPS)  > 오브젝트 파일을 만들려면 cpp파일이 필요하다 $헤더가 필요하다
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+clean: 
+	rm -f *.exe 
+	rm -f *.o *~ *.stackdump
+'''
+DEPENDENCY TREE 
+                 <- Lab1.o < Matrix.h 와 Lab1.cpp
+all <- Lab1.exe  <- Matrix.o < Matrix.h 와 Matrix.cpp
+*all 은 더미 타겟
+>> Lab1.cpp를 수정하면 컴파일 1번, 링크 1번, 커맨드 2번
+Makefile이 지능적으로 최소한 커맨드로 처리해줌. 컴파일 시간 단축
+ 결론: makefile의 용도 : 의존성을 추론해서 미니멀하게 컴파일을 해준다
+      " 타켓 : 의존 리스트 " 는 해석할 줄 알아야 한다
+      

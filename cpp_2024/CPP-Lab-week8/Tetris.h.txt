@@ -1,0 +1,17 @@
+#include "Matrix.h"
+
+class Tetris{
+    private:
+        int wallDepth;
+        Matrix *iScreen;
+        Matrix *oScreen;
+        Matrix *currBlk;
+    public:
+        Tetris(int cy, int cx);
+        ~Tetris();
+        int get_numTypes();
+        int accept(char key);
+        Matrix *get_oScreen();
+        int get_wallDepth();
+};
+

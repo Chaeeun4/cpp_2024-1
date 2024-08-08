@@ -1,0 +1,85 @@
+bool touchDown;
+  if (touchDown){
+    _state = TetrisState::NewBlock;
+    }
+
+  if (_state == TetrisState::Finished)
+    return _state;
+
+  else if (_state == TetrisState::NewBlock) {
+    _state = TetrisState::Running;
+    // init variables for screen refresh with the new block
+    currCBlk = setOfColorBlockObjects[type][degree];
+    Matrix *tempCBlk = iCScreen->clip(top, left, top + currCBlk->get_dy(), left + currCBlk->get_dx());
+    Matrix *tempCBlk2 = tempCBlk->add(currCBlk);
+    delete tempCBlk;
+
+    // update oScreen before conflict test
+    oCScreen->paste(iCScreen, 0, 0);
+    oCScreen->paste(tempCBlk2, top, left);
+    // if (tempBlk2->anyGreaterThan(1)) // exit the game
+    //   _state = TetrisState::Finished;
+    delete tempCBlk2;
+    if ((key == ' ')||(key =='s')) _state = TetrisState::NewBlock;
+    return _state;
+  }
+
+  else if (_state == TetrisState::Running) {
+    if(currCBlk == NULL){
+      currCBlk = setOfColorBlockObjects[type][degree];
+      Matrix *tempCBlk = iCScreen->clip(top, left, top + currCBlk->get_dy(), left + currCBlk->get_dx());
+      Matrix *tempCBlk2 = tempCBlk->add(currCBlk);
+      delete tempCBlk;
+
+      // update oScreen before conflict test
+      oCScreen->paste(iCScreen, 0, 0);
+      oCScreen->paste(tempCBlk2, top, left);
+      delete tempCBlk2;
+      return _state = TetrisState::Running;
+    }
+
+    _state = TetrisState::Running;
+    switch (key) { // perform the requested action
+      case 'a': break;
+      case 'd': break;
+      case 'w':
+        currCBlk = setOfColorBlockObjects[type][degree]; 
+        break;
+      case 's':
+        //간이 충돌검사
+        top++;
+        Matrix *tempBlk, *tempBlk2;
+        tempBlk = iScreen->clip(top, left, top + currBlk->get_dy(), left + currBlk->get_dx());
+        tempBlk2 = tempBlk->add(currBlk);
+        delete tempBlk;
+        if(tempBlk2->anyGreaterThan(1)) touchDown = true;
+        delete tempBlk2;
+        top--;
+        break;
+      case ' ': touchDown = true; break;
+      default: cout << "CTetris::accept: wrong key input" << endl;
+    }
+    cout << "C" << top << left << degree << endl;
+
+    Matrix *tempCBlk = iCScreen->clip(top, left, top + currCBlk->get_dy(), left + currCBlk->get_dx());
+    Matrix *tempCBlk2 = tempCBlk->add(currCBlk);
+    delete tempCBlk;
+
+    // update oScreen before conflict test
+    oCScreen->paste(iCScreen, 0, 0);
+    oCScreen->paste(tempCBlk2, top, left);
+    delete tempCBlk2;
+
+    if (touchDown) {
+      oCScreen = deleteFullLines(oCScreen, currCBlk, top, wallDepth);
+      iCScreen->paste(oCScreen, 0, 0);
+      touchDown = false;
+    }
+
+    return _state;
+  }
+  
+  // you can use the following code if you want to
+  // oCScreen = deleteFullLines(oCScreen, currCBlk, top, wallDepth);
+
+  return _state;

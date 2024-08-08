@@ -1,0 +1,71 @@
+﻿#include "Tetris.h"
+
+int *allocArrayScreen(int dy, int dx, int dw) {
+  int **array2d = new int*[dy + dw];
+  int y, x;
+
+  for (y = 0; y < dy+dw; y++) // alloc array2d
+    array2d[y] = new int[dx + 2*dw];
+  
+  for (y = 0; y < dy+dw; y++) {
+    for (x = 0; x < dw; x++) {
+      array2d[y][x] = 1; // left wall
+      array2d[y][dw+dx+x] = 1; // right wall
+    }
+    if (y < dy) {
+      for (x = 0; x < dx; x++)
+        array2d[y][dw+x] = 0; // empty space
+    }
+    else {
+      for (x = 0; x < dx; x++)
+        array2d[y][dw+x] = 1; // bottom ground
+    }
+  }
+
+  int *array1d = new int[(dy+dw)*(dx+2*dw)]; // alloc array2d
+  for (y = 0; y < dy+dw; y++)
+    for (x = 0; x < dx+2*dw; x++)
+      array1d[(dx+2*dw)*y + x] = array2d[y][x]; // copy 2d to 1d
+
+  for (int y = 0; y < dy+dw; y++) // dealloc array2d
+    delete [] array2d[y];
+  delete [] array2d;
+
+  return array1d;  
+}
+
+Tetris::Tetris(int cy, int cx){
+  wallDepth = 4;
+  int rows = cy + wallDepth;
+  int cols = cx + 2 * wallDepth;
+
+  int *arrayScreen = allocArrayScreen(cy, cx, wallDepth);
+    //세 인자를 받아 2차원 배열로 할당해주는
+  iScreen = new Matrix(arrayScreen, rows, cols);
+  oScreen = new Matrix(iScreen);
+  currBlk = new Matrix(3, 3);
+  delete arrayScreen; // 이거 맞나?
+}
+
+Tetris::~Tetris(){
+  delete iScreen;
+  delete oScreen;
+  delete currBlk;
+}
+
+int Tetris::get_numTypes(){
+  return 3;
+}
+
+int Tetris::accept(char key){
+  return 0;
+}
+
+Matrix *Tetris::get_oScreen(){
+  return oScreen;
+}
+
+int Tetris::get_wallDepth(){
+  return wallDepth;
+}
+
